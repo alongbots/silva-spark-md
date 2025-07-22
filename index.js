@@ -76,38 +76,6 @@ console.log("Session downloaded ✅")
   const express = require("express");
   const app = express();
   const port = process.env.PORT || 9090;
- //═══════════════════════════════════════════════════════════════════════════════════\
-    //                                 ANTI DELETE HANDLER
-    //═══════════════════════════════════════════════════════════════════════════════════\
-
-    if (antideleteEnabled) {
-        conn.ev.on('messages.delete', async (del) => {
-            try {
-                if (!del || !del.keys || del.keys.length === 0) return;
-
-                const key = del.keys[0];
-                const msg = await P.loadMessage(key);
-                if (!msg || key.fromMe) return;
-
-                const senderJid = key.participant || key.remoteJid;
-                const chatName = (await conn.groupMetadata(key.remoteJid).catch(() => null))?.subject || 'Private Chat';
-                const whoDeleted = jidDecode(senderJid)?.user || 'Unknown';
-                const deletedText = msg?.message?.conversation || msg?.message?.extendedTextMessage?.text || '[Media/Sticker/Document]';
-
-                const report = `🗑️ *ANTI-DELETE ALERT*
-
-👤 *Deleted By:* wa.me/${whoDeleted}
-💬 *Message:* ${deletedText}
-💬 *Chat:* ${chatName}`;
-
-                await conn.sendMessage(global.owner[0], { text: report });
-            } catch (err) {
-                console.error('Anti-delete error:', err);
-            }
-        });
-    }
-
-    //═══════════════════════════════════════════════════════════════════════════════════\
   
   //=============================================
   
