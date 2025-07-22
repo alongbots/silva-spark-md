@@ -115,32 +115,7 @@ console.log("Session downloaded ✅")
   }
   })
   conn.ev.on('creds.update', saveCreds)  
-    // anti-delete: recover deleted messages
-  conn.ev.on('messages.update', async updates => {
-    for (const u of updates) {
-      if (!u.message || u.key.fromMe) continue
-      try {
-        const original = await conn.loadMessage(u.key.remoteJid, u.key.id)
-        if (!original) continue
-        const sender = u.key.participant || u.key.remoteJid
-        const chat = u.key.remoteJid
-        const type = getContentType(original.message)
-        const text = (type === 'conversation')
-          ? original.message.conversation
-          : original.message[type]?.text || original.message[type]?.caption || '[Media]'
-        
-        await conn.sendMessage(chat, {
-          text: `🛑 *Anti-Delete Alert*\n@${sender.split('@')[0]} deleted a message:\n${text}`,
-          mentions: [sender]
-        })
-
-        await conn.copyNForward(chat, original, true)
-      } catch (e) {
-        console.error("anti-delete error", e)
-      }
-    }
-  })
-          
+      
   //=============readstatus=======
         
   conn.ev.on('messages.upsert', async(mek) => {
